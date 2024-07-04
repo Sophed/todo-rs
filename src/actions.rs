@@ -38,7 +38,7 @@ pub fn remove_task(path: &PathBuf, line: i32) {
     let content = parts.join("\n");
 
     fs::write(path, content).expect("failed to write to file");
-    print!("removed task \"{task}\"")
+    println!("removed task \"{}\"", &task[6..])
 }
 
 pub fn check_task(path: &PathBuf, line: i32) {
