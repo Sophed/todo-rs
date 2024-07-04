@@ -9,6 +9,9 @@
 
 ## Usage
 `todo add <task>`
+
 `todo remove <task number>`
+
 `todo check <task number>`
+
 `todo uncheck <task number>`
