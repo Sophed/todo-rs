@@ -41,7 +41,7 @@ fn main() -> ExitCode {
                     println!("usage: todo add <task>");
                     return ExitCode::from(1);
                 }
-                add_task(&todo_file, args[2..].join(" ").as_str());
+                add_task(&todo_file, args[2..].join(" ").as_str()).expect("failed to write file");
                 return ExitCode::from(0);
             }
             _ => {}
@@ -52,9 +52,23 @@ fn main() -> ExitCode {
             Err(_) => panic!("invalid line number"),
         };
         match action.as_str() {
-            "remove" | "delete" | "del" | "-" => remove_task(&todo_file, selected_line),
-            "check" | "done" => check_task(&todo_file, selected_line),
-            "uncheck" | "undo" => uncheck_task(&todo_file, selected_line),
+            "remove" | "delete" | "del" | "-" => {
+                remove_task(&todo_file, selected_line).expect("failed to write file")
+            }
+            "check" | "done" => match set_task_state(&todo_file, selected_line, true) {
+                Ok(_) => {}
+                Err(_) => {
+                    print!("invalid task");
+                    return ExitCode::from(1);
+                }
+            },
+            "uncheck" | "undo" => match set_task_state(&todo_file, selected_line, false) {
+                Ok(_) => {}
+                Err(_) => {
+                    print!("invalid task");
+                    return ExitCode::from(1);
+                }
+            },
             _ => {}
         }
         return ExitCode::from(0);

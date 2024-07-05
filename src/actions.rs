@@ -1,6 +1,7 @@
 use std::{
     fs::{self, File, OpenOptions},
     io::{Read, Write},
+    num::TryFromIntError,
     path::PathBuf,
 };
 
@@ -14,7 +15,7 @@ pub fn init_file(path: PathBuf) -> File {
     };
 }
 
-pub fn add_task(path: &PathBuf, task: &str) {
+pub fn add_task(path: &PathBuf, task: &str) -> Result<(), std::io::Error> {
     let mut task_line = String::from("- [ ] ");
     task_line.push_str(task);
     task_line.push_str("\n");
@@ -22,51 +23,57 @@ pub fn add_task(path: &PathBuf, task: &str) {
         .write(true)
         .append(true)
         .open(path)
-        .unwrap();
-    file.write(task_line.as_bytes())
-        .expect("failed to write to file");
-    println!("added \"{task}\"")
+        .expect("failed to open file");
+    match file.write(task_line.as_bytes()) {
+        Ok(_) => {}
+        Err(e) => return Err(e),
+    }
+    println!("added \"{task}\"");
+    Ok(())
 }
 
-pub fn remove_task(path: &PathBuf, line: i32) {
-    let mut file = File::open(path).unwrap();
+pub fn remove_task(path: &PathBuf, line: i32) -> Result<(), TryFromIntError> {
+    let mut file = File::open(path).expect("failed to open file");
     let mut content = String::new();
-    file.read_to_string(&mut content).unwrap();
+    file.read_to_string(&mut content)
+        .expect("failed to read file");
     let mut parts = content.split("\n").collect::<Vec<&str>>();
 
-    let task = parts.remove(line.try_into().expect("invalid task"));
+    let task = parts.remove(match line.try_into() {
+        Ok(i) => i,
+        Err(e) => return Err(e),
+    });
     let content = parts.join("\n");
 
     fs::write(path, content).expect("failed to write to file");
-    println!("removed task \"{}\"", &task[6..])
+    println!("removed task \"{}\"", &task[6..]);
+    Ok(())
 }
 
-pub fn check_task(path: &PathBuf, line: i32) {
-    let mut file = File::open(path).unwrap();
+pub fn set_task_state(path: &PathBuf, line: i32, state: bool) -> Result<(), TryFromIntError> {
+    let mut file = File::open(path).expect("failed to open file");
     let mut content = String::new();
-    file.read_to_string(&mut content).unwrap();
+    file.read_to_string(&mut content)
+        .expect("failed to read file");
     let mut parts = content.split("\n").collect::<Vec<&str>>();
 
-    let task = parts.remove(line.try_into().expect("invalid task"));
-    let task = task.replacen("- [ ] ", "- [x] ", 1);
+    let mut task = parts
+        .remove(match line.try_into() {
+            Ok(i) => i,
+            Err(e) => return Err(e),
+        })
+        .to_string();
+
+    if state {
+        task.replace_range(4..5, "x")
+    } else {
+        task.replace_range(4..5, " ")
+    }
+
     parts.push(&task);
     let content = parts.join("\n");
 
     fs::write(path, content).expect("failed to write to file");
-    println!("completed task \"{}\"", &task[6..])
-}
-
-pub fn uncheck_task(path: &PathBuf, line: i32) {
-    let mut file = File::open(path).unwrap();
-    let mut content = String::new();
-    file.read_to_string(&mut content).unwrap();
-    let mut parts = content.split("\n").collect::<Vec<&str>>();
-
-    let task = parts.remove(line.try_into().expect("invalid task"));
-    let task = task.replacen("- [x] ", "- [ ] ", 1);
-    parts.push(&task);
-    let content = parts.join("\n");
-
-    fs::write(path, content).expect("failed to write to file");
-    println!("unchecked task \"{}\"", &task[6..])
+    println!("completed task \"{}\"", &task[6..]);
+    Ok(())
 }
