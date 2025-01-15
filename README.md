@@ -1,4 +1,4 @@
-# todo-rs
+# todo cli
 
 ![image](demo.png)
 
