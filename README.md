@@ -1,17 +1,20 @@
 # todo-rs
 
-![image](screenshot.png)
+![image](demo.png)
+
+> [!TIP]
+> Tasks are automatically removed after they have been displayed 5 times while completed
 
 ## Installation
-1. `git clone https://github.com/Sophed/todo-rs.git`
-2. `cd todo-rs`
+1. `git clone https://github.com/Sophed/todo.git`
+2. `cd todo`
 3. `cargo build --release`
 
 ## Usage
-`todo add <task>`
+- Add a task: `todo add <task>` — Aliases: `create`, `new`, `+`
 
-`todo remove <task number>`
+- Remove a task: `todo remove <index>` — Aliases: `delete`, `del`, `-`
 
-`todo check <task number>`
+- Toggle a task: `todo done <index>` — Aliases: `do`, `x`, `toggle`
 
-`todo uncheck <task number>`
+- Help menu: `todo help` — Aliases: `?`
