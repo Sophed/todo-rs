@@ -40,8 +40,8 @@ fn main() -> Result<()> {
             actions::display::display(&data_file)?
         }
         "remove" | "delete" | "del" | "-" => {
-            let index: u8 = match args.get(2) {
-                Some(s) => s.parse::<u8>()?,
+            let index: usize = match args.get(2) {
+                Some(s) => s.parse::<usize>()?,
                 None => {
                     return Err(Error::msg("invalid index provided, usage: todo remove <id>"));
                 }
@@ -51,8 +51,8 @@ fn main() -> Result<()> {
             actions::display::display(&data_file)?
         }
         "done" | "do" | "x" | "toggle" => {
-            let index: u8 = match args.get(2) {
-                Some(s) => s.parse::<u8>()?,
+            let index: usize = match args.get(2) {
+                Some(s) => s.parse::<usize>()?,
                 None => {
                     return Err(Error::msg("invalid index provided, usage: todo done <id>"));
                 }
