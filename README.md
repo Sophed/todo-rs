@@ -11,6 +11,8 @@
 3. `cargo build --release`
 
 ## Usage
+- Show current tasks: `todo`
+
 - Add a task: `todo add <task>` — Aliases: `create`, `new`, `+`
 
 - Remove a task: `todo remove <index>` — Aliases: `delete`, `del`, `-`
